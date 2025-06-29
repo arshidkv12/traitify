@@ -101,10 +101,11 @@ PHP_METHOD(Macroable, macro)
         zval tmp;
         array_init(&tmp);
         zend_update_static_property_ex(called_scope, property_macros_name, &tmp);
+		zval_ptr_dtor(&tmp); 
         macros = zend_read_static_property_ex(called_scope, property_macros_name, 0);
     }
 
-    zval cb_copy;
+     zval cb_copy;
     ZVAL_COPY(&cb_copy, callback);
     zend_hash_update(Z_ARRVAL_P(macros), name, &cb_copy);
 	zend_string_release(property_macros_name);
