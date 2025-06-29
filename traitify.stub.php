@@ -22,3 +22,12 @@ trait Singleton
      */
     public static function getInstance(): object {}
 }
+
+
+
+trait Macroable {
+    protected static array $macros = [];
+
+    public static function macro(string $name, callable $callback): void {}
+    public function __call(string $name, array $arguments): mixed {}
+}

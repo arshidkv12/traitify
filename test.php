@@ -1,22 +1,16 @@
 <?php 
 
-class MyService {
-    use Traitify\Singleton;
+ 
 
-    function hello(){
-        return "hello";
-    }
 
-    private function __construct()
-    {
-        echo 9;
-    }
+use Traitify\Macroable;
 
+class Tool {
+    use Macroable;
 }
 
-$a = MyService::getInstance();
-$b = MyService::getInstance();
-
-var_dump($a === $b); // true
-
-var_dump( $a->hello() );
+Tool::macro('greet', fn($name, $age) => "Hello, $name! $age");
+Tool::macro('greet1', fn($name) => "Hello---, $name!");
+$t = new Tool();
+echo $t->greet1("Arshid");
+echo $t->greet("Arshid", 33);

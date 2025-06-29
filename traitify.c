@@ -9,6 +9,7 @@
 #include "zend_interfaces.h"
 #include "php_traitify.h"
 #include "traitify_arginfo.h"
+#include "zend_exceptions.h"
 
 /* For compatibility with older PHP versions */
 #ifndef ZEND_PARSE_PARAMETERS_NONE
@@ -40,8 +41,8 @@ PHP_MINFO_FUNCTION(traitify)
 /* }}} */
 
 
-
 zend_class_entry *traitify_singleton_ce;
+zend_class_entry *traitify_macroable_ce;
 
 /* {{{ Singleton::getInstance() */
 ZEND_METHOD(Singleton, getInstance)
@@ -51,6 +52,7 @@ ZEND_METHOD(Singleton, getInstance)
     zend_string *key = zend_string_init("instance", sizeof("instance") - 1, 0);
 
     instance = zend_read_static_property_ex(called_scope, key, 0);
+	zend_string_release(key);
 
     if (Z_TYPE_P(instance) == IS_OBJECT && instanceof_function(Z_OBJCE_P(instance), called_scope)) {
         RETURN_ZVAL(instance, 1, 0);
@@ -75,17 +77,111 @@ ZEND_METHOD(Singleton, getInstance)
 /* }}} */
 
 
+/* {{{ proto void Traitify\Macroable::macro(string $name, callable $callback) */
+PHP_METHOD(Macroable, macro)
+{
+    zend_string *name;
+    zval *callback;
+
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+        Z_PARAM_STR(name)
+        Z_PARAM_ZVAL(callback)
+    ZEND_PARSE_PARAMETERS_END();
+
+    if (!zend_is_callable(callback, 0, NULL)) {
+        zend_throw_exception(NULL, "Second argument must be callable", 0);
+        RETURN_THROWS();
+    }
+
+	zend_string *property_macros_name = zend_string_init("macros", sizeof("macros") - 1, 0);
+	zend_class_entry *called_scope = zend_get_called_scope(execute_data);
+	zval *macros =zend_read_static_property_ex(called_scope, property_macros_name, 0);
+
+	if (Z_TYPE_P(macros) != IS_ARRAY) {
+        zval tmp;
+        array_init(&tmp);
+        zend_update_static_property_ex(called_scope, property_macros_name, &tmp);
+        macros = zend_read_static_property_ex(called_scope, property_macros_name, 0);
+    }
+
+    zval cb_copy;
+    ZVAL_COPY(&cb_copy, callback);
+    zend_hash_update(Z_ARRVAL_P(macros), name, &cb_copy);
+	zend_string_release(property_macros_name);
+
+}
+/* }}} */
+
+/* {{{ */
+PHP_METHOD(Macroable, __call)
+{
+    zend_string *name;
+    zval *args_array;
+
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+        Z_PARAM_STR(name)
+        Z_PARAM_ARRAY(args_array)
+    ZEND_PARSE_PARAMETERS_END();
+
+    zend_string *property_macros_name = zend_string_init("macros", sizeof("macros") - 1, 0);
+    zend_class_entry *called_scope = zend_get_called_scope(execute_data);
+    zval *macros = zend_read_static_property_ex(called_scope, property_macros_name, 0);
+    zend_string_release(property_macros_name);
+
+    if (!macros || Z_TYPE_P(macros) != IS_ARRAY) {
+        zend_throw_exception(NULL, "No macros registered", 0);
+        RETURN_THROWS();
+    }
+
+    zval *callback = zend_hash_find(Z_ARRVAL_P(macros), name);
+    if (!callback) {
+        zend_throw_exception_ex(NULL, 0, "Macro '%s' not found", ZSTR_VAL(name));
+        RETURN_THROWS();
+    }
+
+    uint32_t argc = zend_hash_num_elements(Z_ARRVAL_P(args_array));
+    zval *params = safe_emalloc(argc, sizeof(zval), 0);
+
+    uint32_t i = 0;
+    zval *entry;
+    ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(args_array), entry) {
+        ZVAL_COPY(&params[i], entry);
+        i++;
+    } ZEND_HASH_FOREACH_END();
+
+    zval retval;
+    if (call_user_function(EG(function_table), NULL, callback, &retval, argc, params) == SUCCESS) {
+        for (uint32_t j = 0; j < argc; ++j) {
+            zval_ptr_dtor(&params[j]);
+        }
+        efree(params);
+        RETURN_ZVAL(&retval, 1, 1);
+    } else {
+        for (uint32_t j = 0; j < argc; ++j) {
+            zval_ptr_dtor(&params[j]);
+        }
+        efree(params);
+        zend_throw_exception(NULL, "Failed to call macro", 0);
+        RETURN_THROWS();
+    }
+}
+/* }}} */
+
+
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(traitify)
 {
     zend_class_entry ce;
 
-    INIT_NS_CLASS_ENTRY(ce, "Traitify", "Singleton", singleton_trait_methods);
+    INIT_NS_CLASS_ENTRY(ce, "Traitify", "Singleton", singleton_methods);
     traitify_singleton_ce = zend_register_internal_class(&ce);
-
     traitify_singleton_ce->ce_flags |= ZEND_ACC_TRAIT;
-
     zend_declare_property_null(traitify_singleton_ce, "instance", sizeof("instance") - 1, ZEND_ACC_PROTECTED | ZEND_ACC_STATIC);
+
+	INIT_NS_CLASS_ENTRY(ce, "Traitify", "Macroable", macroable_methods);
+    traitify_macroable_ce = zend_register_internal_class(&ce);
+    traitify_macroable_ce->ce_flags |= ZEND_ACC_TRAIT;
+	zend_declare_property_null(traitify_macroable_ce, "macros", sizeof("macros") - 1, ZEND_ACC_PROTECTED | ZEND_ACC_STATIC);
 
     return SUCCESS;
 }
@@ -96,14 +192,14 @@ PHP_MINIT_FUNCTION(traitify)
 /* {{{ traitify_module_entry */
 zend_module_entry traitify_module_entry = {
 	STANDARD_MODULE_HEADER,
-	"traitify",					/* Extension name */
-	NULL,				/* zend_function_entry */
-	PHP_MINIT(traitify),       // MINIT,							/* PHP_MINIT - Module initialization */
+	"traitify",					    /* Extension name */
+	NULL,				            /* zend_function_entry */
+	PHP_MINIT(traitify),            /* PHP_MINIT - Module initialization */
 	NULL,							/* PHP_MSHUTDOWN - Module shutdown */
 	PHP_RINIT(traitify),			/* PHP_RINIT - Request initialization */
 	NULL,							/* PHP_RSHUTDOWN - Request shutdown */
 	PHP_MINFO(traitify),			/* PHP_MINFO - Module info */
-	PHP_TRAITIFY_VERSION,		/* Version */
+	PHP_TRAITIFY_VERSION,		    /* Version */
 	STANDARD_MODULE_PROPERTIES
 };
 /* }}} */
