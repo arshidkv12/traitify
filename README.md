@@ -35,4 +35,26 @@ extension=traitify.so
 ### ✨ Example Usage
  
 
+```php
+<?php
+
+class MyService {
+    use Traitify\Singleton;
+
+    public function __construct() {
+        echo "Constructing...\n";
+    }
+
+    public function hello() {
+        return "Hello World";
+    }
+}
+
+$a = MyService::getInstance();
+$b = MyService::getInstance();
+
+var_dump($a === $b);   // true
+echo $a->hello();      // Hello World
+```
+
 
