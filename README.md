@@ -36,6 +36,7 @@ extension=traitify.so
 
 ### ✨ Example Usage
  
+#### Singleton Trait
 
 ```php
 <?php
