@@ -30,7 +30,9 @@ sudo make install
 
 
 ### 2. Enable in php.ini
+```bash
 extension=traitify.so
+```
 
 ### ✨ Example Usage
  
