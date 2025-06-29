@@ -49,10 +49,9 @@ ZEND_METHOD(Singleton, getInstance)
 {
     zend_class_entry *called_scope = zend_get_called_scope(execute_data);
     zval *instance;
-    zend_string *key = zend_string_init("instance", sizeof("instance") - 1, 0);
+    zend_string *property_instance_name = zend_string_init("instance", sizeof("instance") - 1, 0);
 
-    instance = zend_read_static_property_ex(called_scope, key, 0);
-	zend_string_release(key);
+    instance = zend_read_static_property_ex(called_scope, property_instance_name, 0);
 
     if (Z_TYPE_P(instance) == IS_OBJECT && instanceof_function(Z_OBJCE_P(instance), called_scope)) {
         RETURN_ZVAL(instance, 1, 0);
@@ -70,9 +69,9 @@ ZEND_METHOD(Singleton, getInstance)
         }
     }
 	
-    zend_update_static_property_ex(called_scope, key, return_value);
+    zend_update_static_property_ex(called_scope, property_instance_name, return_value);
 
-    zend_string_release(key);
+    zend_string_release(property_instance_name);
 }
 /* }}} */
 

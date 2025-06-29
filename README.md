@@ -40,6 +40,7 @@ extension=traitify.so
 
 ```php
 <?php
+use Traitify\Singleton;
 
 class MyService {
     use Traitify\Singleton;
@@ -59,5 +60,21 @@ $b = MyService::getInstance();
 var_dump($a === $b);   // true
 echo $a->hello();      // Hello World
 ```
+
+
+#### Macroable Trait
+
+```php
+<?php
+
+use Traitify\Macroable;
+
+class Tool {
+    use Macroable;
+}
+
+Tool::macro('greet', fn($name) => "Hello, $name!");
+$t = new Tool();
+echo $t->greet("Arshid"); // Hello, Arshid
 
 
