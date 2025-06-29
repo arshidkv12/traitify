@@ -41,11 +41,8 @@ PHP_MINFO_FUNCTION(traitify)
 /* }}} */
 
 
-zend_class_entry *traitify_singleton_ce;
-zend_class_entry *traitify_macroable_ce;
-
 /* {{{ Singleton::getInstance() */
-ZEND_METHOD(Singleton, getInstance)
+ZEND_METHOD(Traitify_Singleton, getInstance)
 {
     zend_class_entry *called_scope = zend_get_called_scope(execute_data);
     zval *instance;
@@ -78,7 +75,7 @@ ZEND_METHOD(Singleton, getInstance)
 
 
 /* {{{ proto void Traitify\Macroable::macro(string $name, callable $callback) */
-PHP_METHOD(Macroable, macro)
+PHP_METHOD(Traitify_Macroable, macro)
 {
     zend_string *name;
     zval *callback;
@@ -103,9 +100,11 @@ PHP_METHOD(Macroable, macro)
         zend_update_static_property_ex(called_scope, property_macros_name, &tmp);
 		zval_ptr_dtor(&tmp); 
         macros = zend_read_static_property_ex(called_scope, property_macros_name, 0);
-    }
+    } else {
+		SEPARATE_ARRAY(macros); 
+	}
 
-     zval cb_copy;
+    zval cb_copy;
     ZVAL_COPY(&cb_copy, callback);
     zend_hash_update(Z_ARRVAL_P(macros), name, &cb_copy);
 	zend_string_release(property_macros_name);
@@ -114,7 +113,7 @@ PHP_METHOD(Macroable, macro)
 /* }}} */
 
 /* {{{ */
-PHP_METHOD(Macroable, __call)
+PHP_METHOD(Traitify_Macroable, __call)
 {
     zend_string *name;
     zval *args_array;
@@ -172,17 +171,9 @@ PHP_METHOD(Macroable, __call)
 /* {{{ PHP_MINIT_FUNCTION */
 PHP_MINIT_FUNCTION(traitify)
 {
-    zend_class_entry ce;
 
-    INIT_NS_CLASS_ENTRY(ce, "Traitify", "Singleton", singleton_methods);
-    traitify_singleton_ce = zend_register_internal_class(&ce);
-    traitify_singleton_ce->ce_flags |= ZEND_ACC_TRAIT;
-    zend_declare_property_null(traitify_singleton_ce, "instance", sizeof("instance") - 1, ZEND_ACC_PROTECTED | ZEND_ACC_STATIC);
-
-	INIT_NS_CLASS_ENTRY(ce, "Traitify", "Macroable", macroable_methods);
-    traitify_macroable_ce = zend_register_internal_class(&ce);
-    traitify_macroable_ce->ce_flags |= ZEND_ACC_TRAIT;
-	zend_declare_property_null(traitify_macroable_ce, "macros", sizeof("macros") - 1, ZEND_ACC_PROTECTED | ZEND_ACC_STATIC);
+    register_class_Traitify_Singleton();
+	register_class_Traitify_Macroable();
 
     return SUCCESS;
 }

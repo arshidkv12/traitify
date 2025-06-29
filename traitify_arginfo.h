@@ -1,33 +1,62 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 54b0ffc3af871b189435266df516f7575c1b9675 */
+ * Stub hash: 054fff39c695eef5b16e0853d94be73ebd6795b7 */
 
-
-ZEND_METHOD(Singleton, getInstance);
-
-ZEND_BEGIN_ARG_INFO(arginfo_get_instance, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_Traitify_Singleton_getInstance, 0, 0, IS_OBJECT, 0)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry singleton_methods[] = {
-    ZEND_ME(Singleton, getInstance, arginfo_get_instance, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-    ZEND_FE_END
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_Traitify_Macroable_macro, 0, 2, IS_VOID, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_Traitify_Macroable___call, 0, 2, IS_MIXED, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, arguments, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_METHOD(Traitify_Singleton, getInstance);
+ZEND_METHOD(Traitify_Macroable, macro);
+ZEND_METHOD(Traitify_Macroable, __call);
+
+static const zend_function_entry class_Traitify_Singleton_methods[] = {
+	ZEND_ME(Traitify_Singleton, getInstance, arginfo_class_Traitify_Singleton_getInstance, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_FE_END
 };
 
-
-PHP_METHOD(Macroable, macro);
-PHP_METHOD(Macroable, __call);
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_macro, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo___call, 0, 0, 2)
-    ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, arguments, IS_ARRAY, 0)
-ZEND_END_ARG_INFO()
-
-static const zend_function_entry macroable_methods[] = {
-	PHP_ME(Macroable, macro, arginfo_macro, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-    PHP_ME(Macroable, __call, arginfo___call, ZEND_ACC_PUBLIC)
-    ZEND_FE_END
+static const zend_function_entry class_Traitify_Macroable_methods[] = {
+	ZEND_ME(Traitify_Macroable, macro, arginfo_class_Traitify_Macroable_macro, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	ZEND_ME(Traitify_Macroable, __call, arginfo_class_Traitify_Macroable___call, ZEND_ACC_PUBLIC)
+	ZEND_FE_END
 };
+
+static zend_class_entry *register_class_Traitify_Singleton(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_NS_CLASS_ENTRY(ce, "Traitify", "Singleton", class_Traitify_Singleton_methods);
+	class_entry = zend_register_internal_class_with_flags(&ce, NULL, ZEND_ACC_TRAIT);
+
+	zval property_instance_default_value;
+	ZVAL_NULL(&property_instance_default_value);
+	zend_string *property_instance_name = zend_string_init("instance", sizeof("instance") - 1, 1);
+	zend_declare_typed_property(class_entry, property_instance_name, &property_instance_default_value, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC, NULL, (zend_type) ZEND_TYPE_INIT_NONE(0));
+	zend_string_release(property_instance_name);
+
+	return class_entry;
+}
+
+static zend_class_entry *register_class_Traitify_Macroable(void)
+{
+	zend_class_entry ce, *class_entry;
+
+	INIT_NS_CLASS_ENTRY(ce, "Traitify", "Macroable", class_Traitify_Macroable_methods);
+	class_entry = zend_register_internal_class_with_flags(&ce, NULL, ZEND_ACC_TRAIT);
+
+	zval property_macros_default_value;
+	ZVAL_EMPTY_ARRAY(&property_macros_default_value);
+	zend_string *property_macros_name = zend_string_init("macros", sizeof("macros") - 1, 1);
+	zend_declare_typed_property(class_entry, property_macros_name, &property_macros_default_value, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC, NULL, (zend_type) ZEND_TYPE_INIT_MASK(MAY_BE_ARRAY));
+	zend_string_release(property_macros_name);
+
+	return class_entry;
+}
