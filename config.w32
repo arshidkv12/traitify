@@ -1,0 +1,7 @@
+ARG_ENABLE('traitify', 'traitify support', 'no');
+
+if (PHP_TRAITIFY != 'no') {
+	AC_DEFINE('HAVE_TRAITIFY', 1, "Define to 1 if the PHP extension 'traitify' is available.");
+
+	EXTENSION('traitify', 'traitify.c', null, '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
+}
