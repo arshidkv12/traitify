@@ -3,17 +3,14 @@
  
 
 
-class MyService {
-    use Traitify\Singleton;
+use Traitify\Macroable;
 
-    public function __construct() {
-        echo "Constructing...\n";
-    }
-
-    public function hello() {
-        return "Hello World";
-    }
+class Tool {
+    use Macroable;
 }
 
-$a = MyService::getInstance();
-$b = MyService::getInstance();
+Tool::macro('greet', fn($name, $age) => "Hello, $name! $age");
+Tool::macro('greet1', fn($name) => "Hello---, $name!");
+$t = new Tool();
+echo $t->greet1("Arshid");
+echo $t->greet("Arshid", 33);

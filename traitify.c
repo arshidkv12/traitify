@@ -54,6 +54,7 @@ ZEND_METHOD(Singleton, getInstance)
     instance = zend_read_static_property_ex(called_scope, property_instance_name, 0);
 
     if (Z_TYPE_P(instance) == IS_OBJECT && instanceof_function(Z_OBJCE_P(instance), called_scope)) {
+		zend_string_release(property_instance_name);
         RETURN_ZVAL(instance, 1, 0);
     }
 
