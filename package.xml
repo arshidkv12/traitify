@@ -22,7 +22,7 @@
   <release>stable</release>
   <api>stable</api>
  </stability>
- <license uri="https://opensource.org/licenses/MIT">MIT</license>
+ <license uri="https://php.net/license/3_01.txt">PHP License 3.01</license>
  <notes>Initial release of the Traitify extension</notes>
  <contents>
   <dir name="/">
