@@ -30,8 +30,13 @@
    <file name="traitify.c" role="src"/>
    <file name="php_traitify.h" role="src"/>
    <file name="traitify.stub.php" role="src"/>
+   <file name="traitify_arginfo.h" role="src"/>
    <file name="README.md" role="doc"/>
-   <file name="package.xml" role="doc"/>
+   <dir name="tests">
+     <file name="001.phpt" role="test"/>
+     <file name="002.phpt" role="test"/>
+     <file name="003.phpt" role="test"/>
+   </dir>
   </dir>
  </contents>
  <dependencies>
@@ -40,7 +45,7 @@
     <min>8.0</min>
    </php>
    <pearinstaller>
-    <min>1.4.0</min>
+    <min>1.10.0</min>
    </pearinstaller>
   </required>
  </dependencies>
