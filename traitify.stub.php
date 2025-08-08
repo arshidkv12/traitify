@@ -3,6 +3,7 @@
 /**
  * @generate-class-entries
  * @undocumentable
+ * @generate-legacy-arginfo 80000
  */
 
 namespace Traitify;
