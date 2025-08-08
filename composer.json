@@ -1,0 +1,12 @@
+{
+    "name": "arshidkv12/traitify",
+    "type": "php-ext",
+    "license": "traitify-1.03",
+    "description": "Traitify is a native PHP extension that provides commonly used traits",
+    "require": {
+        "php": ">=8.0,<8.6"
+    },
+    "php-ext": {
+        "extension-name": "traitify"
+    }
+}
