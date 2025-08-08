@@ -1,5 +1,5 @@
 /* This is a generated file, edit the .stub.php file instead.
- * Stub hash: 054fff39c695eef5b16e0853d94be73ebd6795b7 */
+ * Stub hash: 4930fae350a73db5e095ee6ce5f4d9034254a349 */
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_class_Traitify_Singleton_getInstance, 0, 0, IS_OBJECT, 0)
 ZEND_END_ARG_INFO()
@@ -34,7 +34,12 @@ static zend_class_entry *register_class_Traitify_Singleton(void)
 	zend_class_entry ce, *class_entry;
 
 	INIT_NS_CLASS_ENTRY(ce, "Traitify", "Singleton", class_Traitify_Singleton_methods);
+#if (PHP_VERSION_ID >= 80400)
 	class_entry = zend_register_internal_class_with_flags(&ce, NULL, ZEND_ACC_TRAIT);
+#else
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	class_entry->ce_flags |= ZEND_ACC_TRAIT;
+#endif
 
 	zval property_instance_default_value;
 	ZVAL_NULL(&property_instance_default_value);
@@ -50,7 +55,12 @@ static zend_class_entry *register_class_Traitify_Macroable(void)
 	zend_class_entry ce, *class_entry;
 
 	INIT_NS_CLASS_ENTRY(ce, "Traitify", "Macroable", class_Traitify_Macroable_methods);
+#if (PHP_VERSION_ID >= 80400)
 	class_entry = zend_register_internal_class_with_flags(&ce, NULL, ZEND_ACC_TRAIT);
+#else
+	class_entry = zend_register_internal_class_ex(&ce, NULL);
+	class_entry->ce_flags |= ZEND_ACC_TRAIT;
+#endif
 
 	zval property_macros_default_value;
 	ZVAL_EMPTY_ARRAY(&property_macros_default_value);
