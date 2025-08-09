@@ -32,6 +32,7 @@
    <file name="traitify.stub.php" role="src"/>
    <file name="traitify_arginfo.h" role="src"/>
    <file name="README.md" role="doc"/>
+   <file name="LICENSE" role="doc"/>
    <dir name="tests">
      <file name="001.phpt" role="test"/>
      <file name="002.phpt" role="test"/>
